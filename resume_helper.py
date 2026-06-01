@@ -23,6 +23,9 @@ RESUME_SYSTEM_PROMPT = """당신은 한국 채용 맥락을 깊이 이해하는 
 5. 추상적 다짐만 있고 구체적 행동/기여 계획이 없음
 6. 문장이 길고 수동태/번역투가 많아 가독성이 떨어짐
 
+[NCS 역량 관점]
+- 직무 관련성, 문제 해결 능력, 의사소통 능력, 조직 이해 능력, 자기개발 능력 관점에서 자소서 내용을 점검합니다.
+
 [추천 글쓰기 프레임워크 — 최소 1개를 활용해 첨삭 제안]
 - STAR: Situation(상황) → Task(과제) → Action(행동) → Result(결과)
 - PREP: Point(결론) → Reason(이유) → Example(예시) → Point(재강조)
@@ -99,6 +102,54 @@ def ask_claude_once(sample_text: str) -> str:
     return message.content[0].text
 
 
+def print_help() -> None:
+    print("=== 도움말 ===")
+    print("- 자소서 내용을 입력하면 첨삭 피드백을 받습니다.")
+    print("- /help : 도움말을 출력합니다.")
+    print("- /quit : 대화를 종료합니다.")
+    print(
+        "- 이름, 연락처, 학교명, 가족 정보, 회사 내부 정보 등 개인정보는 입력하지 마세요."
+    )
+    print("- .env와 자소서 원문 파일은 GitHub에 올리지 마세요.")
+
+
+def chat_loop() -> None:
+    settings = load_settings()
+    print("OpenAI 키 존재 여부:", settings["openai_key_exists"])
+    print("자소서 첨삭 도우미입니다. /help 로 사용법을 확인하세요.")
+
+    client = make_openai_client()
+    model = os.getenv("MODEL_OPENAI", "gpt-5.4-nano")
+
+    while True:
+        user_input = input("자소서 입력 > ").strip()
+
+        if user_input == "/help":
+            print_help()
+            continue
+
+        if user_input == "/quit":
+            print("대화를 종료합니다. 수고하셨습니다.")
+            break
+
+        if not user_input:
+            print("내용을 입력해 주세요. (/help 도움말, /quit 종료)")
+            continue
+
+        messages = [
+            {"role": "system", "content": RESUME_SYSTEM_PROMPT},
+            {"role": "user", "content": user_input},
+        ]
+
+        response = client.chat.completions.create(
+            model=model,
+            max_completion_tokens=300,
+            messages=messages,
+        )
+        answer = response.choices[0].message.content
+        print(answer)
+
+
 def main() -> None:
     settings = load_settings()
     print("OpenAI 키 존재 여부:", settings["openai_key_exists"])
@@ -117,9 +168,10 @@ def main() -> None:
         return
 
     print("\n=== 첨삭 결과 (앞부분) ===")
-    print("result repr:", repr(result))
     print(result[:500])
 
 
 if __name__ == "__main__":
-    main()
+    chat_loop()
+
+# Day 2 self1에서는 이 대화 루프에 /style 명령어를 추가한다.
