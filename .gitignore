@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.venv/
+
+# Secrets and assignment-specific ignores
+.env
+chat_history.json
+resumes/
+outputs/*.json
+*.txt
