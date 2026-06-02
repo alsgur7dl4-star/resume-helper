@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
 
+from styles import STYLE_PRESETS, list_style_names
+
 
 RESUME_SYSTEM_PROMPT = """당신은 한국 채용 맥락을 깊이 이해하는 자소서(자기소개서) 첨삭 전문가입니다.
 
@@ -106,11 +108,31 @@ def print_help() -> None:
     print("=== 도움말 ===")
     print("- 자소서 내용을 입력하면 첨삭 피드백을 받습니다.")
     print("- /help : 도움말을 출력합니다.")
+    print("- /style : 대화 스타일을 변경합니다. (사용법 `/style 간결형`)")
     print("- /quit : 대화를 종료합니다.")
     print(
         "- 이름, 연락처, 학교명, 가족 정보, 회사 내부 정보 등 개인정보는 입력하지 마세요."
     )
     print("- .env와 자소서 원문 파일은 GitHub에 올리지 마세요.")
+
+
+def handle_style_command(user_input: str, current_style_key: str) -> str:
+    parts = user_input.split(maxsplit=1)
+    requested = parts[1].strip() if len(parts) > 1 else ""
+
+    if not requested:
+        print("현재 스타일:", current_style_key)
+        print("사용 가능한 스타일:", list_style_names())
+        print("사용법: /style 간결형")
+        return current_style_key
+
+    if requested in STYLE_PRESETS:
+        print(f"스타일을 '{requested}'(으)로 변경했습니다.")
+        return requested
+
+    print(f"알 수 없는 스타일입니다: {requested}")
+    print("사용 가능한 스타일:", list_style_names())
+    return current_style_key
 
 
 def chat_loop() -> None:
@@ -120,6 +142,7 @@ def chat_loop() -> None:
 
     client = make_openai_client()
     model = os.getenv("MODEL_OPENAI", "gpt-5.4-nano")
+    current_style_key = "간결형"
 
     while True:
         user_input = input("자소서 입력 > ").strip()
@@ -132,18 +155,22 @@ def chat_loop() -> None:
             print("대화를 종료합니다. 수고하셨습니다.")
             break
 
+        if user_input == "/style" or user_input.startswith("/style "):
+            current_style_key = handle_style_command(user_input, current_style_key)
+            continue
+
         if not user_input:
             print("내용을 입력해 주세요. (/help 도움말, /quit 종료)")
             continue
 
         messages = [
-            {"role": "system", "content": RESUME_SYSTEM_PROMPT},
+            {"role": "system", "content": STYLE_PRESETS[current_style_key]["system"]},
             {"role": "user", "content": user_input},
         ]
 
         response = client.chat.completions.create(
             model=model,
-            max_completion_tokens=300,
+            max_completion_tokens=700,
             messages=messages,
         )
         answer = response.choices[0].message.content
@@ -173,5 +200,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     chat_loop()
-
-# Day 2 self1에서는 이 대화 루프에 /style 명령어를 추가한다.
