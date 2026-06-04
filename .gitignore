@@ -15,4 +15,7 @@ wheels/
 chat_history.json
 resumes/
 outputs/*.json
+analyze_result.json
 *.txt
+
+
