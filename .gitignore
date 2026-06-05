@@ -17,5 +17,5 @@ resumes/
 outputs/*.json
 analyze_result.json
 *.txt
-
+*.pyc
 

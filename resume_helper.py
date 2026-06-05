@@ -5,6 +5,7 @@ from openai import OpenAI
 from anthropic import Anthropic
 
 from styles import STYLE_PRESETS, list_style_names
+from day5_self1_resume_pipeline import check_blind_risks, format_blind_report
 
 
 RESUME_SYSTEM_PROMPT = """당신은 한국 채용 맥락을 깊이 이해하는 자소서(자기소개서) 첨삭 전문가입니다.
@@ -116,6 +117,7 @@ def print_help() -> None:
     print("- /style 직무맞춤형 : 지원 직무와의 연결성을 중심으로 첨삭합니다.")
     print("- /style 친근한 버전 : 문장을 부드럽고 자연스럽게 다듬습니다.")
     print("- /style AI 서비스 연결형 : 웹 개발 경험을 MCP·AI 서비스 역량과 연결합니다.")
+    print("- /blind : 블라인드 채용 위험 표현 후보를 점검합니다.")
     print("- /quit : 대화를 종료합니다.")
     print(
         "- 이름, 연락처, 학교명, 가족 정보, 회사 내부 정보 등 개인정보는 입력하지 마세요."
@@ -164,6 +166,12 @@ def chat_loop() -> None:
 
         if user_input == "/style" or user_input.startswith("/style "):
             current_style_key = handle_style_command(user_input, current_style_key)
+            continue
+
+        if user_input == "/blind":
+            blind_text = input("점검할 자소서를 입력하세요 > ").strip()
+            found = check_blind_risks(blind_text)
+            print(format_blind_report(found))
             continue
 
         if not user_input:
