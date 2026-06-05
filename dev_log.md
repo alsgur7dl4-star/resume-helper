@@ -2,9 +2,9 @@
 
 - 실행 시각: 2026-06-04
 
-- SDK 버전 메모: openai-agents 기반으로 Agent, Runner, handoff, input_guardrail을 사용함.
+- SDK 버전 메모: Agent, Runner, handoff, input_guardrail을 사용함.
 
-- 실행 명령: `& c:\resume-helper\.venv\Scripts\python.exe c:/resume-helper/resume_agents.py`
+- 실행 명령: `uv run python resume_agents.py`
 
 - Guardrail 차단 케이스:
   - 입력 Guardrail 함수는 구성되어 있음.
@@ -13,13 +13,13 @@
   - Day 5 self1에서 Guardrail 차단 요청을 별도로 추가 테스트할 예정임.
 
 - 라우팅 성공 케이스:
-  - 테스트 1 분석 요청 담당 Agent: 자소서\_분석\_Specialist
-  - 테스트 2 첨삭 요청 담당 Agent: 자소서\_첨삭\_Specialist
-  - 테스트 3 최종본 요청 담당 Agent: 자소서\_최종본\_Specialist
+  - 테스트 1 분석 요청 담당 Agent: `자소서_분석_Specialist`
+  - 테스트 2 첨삭 요청 담당 Agent: `자소서_첨삭_Specialist`
+  - 테스트 3 최종본 요청 담당 Agent: `자소서_최종본_Specialist`
 
 - 오분기 원인:
   - 초기 실행에서 분석 요청이 첨삭 Specialist로 라우팅되는 오분기가 있었음.
-  - handoff 도구명을 ASCII 고유 이름으로 지정하고, 분석·첨삭·최종본 handoff 설명을 더 명확히 분리하여 수정함.
+  - handoff 도구명을 ASCII 고유 이름으로 지정하고, 분석·첨삭·최종본 handoff 설명을 분리하여 수정함.
   - 최종 실행에서는 분석 요청, 첨삭 요청, 최종본 요청이 각각 의도한 Specialist로 라우팅됨.
 
 - Day 5 self1 수정 항목:
