@@ -15,7 +15,9 @@ wheels/
 chat_history.json
 resumes/
 outputs/*.json
+outputs/*.log
+logs/
+submit_local/
 analyze_result.json
 *.txt
 *.pyc
-
